@@ -22,7 +22,74 @@ int is_transpose(int M, int N, int A[N][M], int B[M][N]);
 char transpose_submit_desc[] = "Transpose submission";
 void transpose_submit(int M, int N, int A[N][M], int B[M][N])
 {
+    int i, j, k;
+    int tmp_1, tmp_2, tmp_3, tmp_4, tmp_5, tmp_6, tmp_7, tmp_8;
+
+    for (i = 0; i < N; i += 8) {
+        for (j = 0; j < M; j += 8) {  
+            for (k = 0; k < 4; i++, k++) {
+                tmp_1 = A[i][j];
+                tmp_2 = A[i][j+1];
+                tmp_3 = A[i][j+2];
+                tmp_4 = A[i][j+3];
+                tmp_5 = A[i][j+4];
+                tmp_6 = A[i][j+5];
+                tmp_7 = A[i][j+6];
+                tmp_8 = A[i][j+7];
+
+                B[j][i] = tmp_1;
+                B[j+1][i] = tmp_2;
+                B[j+2][i] = tmp_3;
+                B[j+3][i] = tmp_4;
+                B[j][i+4] = tmp_5;
+                B[j+1][i+4] = tmp_6;
+                B[j+2][i+4] = tmp_7;
+                B[j+3][i+4] = tmp_8;
+            }
+            i -= 4;
+
+            for (k = 0; k < 4; j++, k++) {
+                tmp_1 = A[i+4][j];
+                tmp_2 = A[i+5][j];
+                tmp_3 = A[i+6][j];
+                tmp_4 = A[i+7][j];
+                tmp_5 = B[j][i+4];
+                tmp_6 = B[j][i+5];
+                tmp_7 = B[j][i+6];
+                tmp_8 = B[j][i+7];
+
+                B[j][i+4] = tmp_1; 
+                B[j][i+5] = tmp_2;
+                B[j][i+6] = tmp_3;
+                B[j][i+7] = tmp_4;
+                B[j+4][i] = tmp_5;
+                B[j+4][i+1] = tmp_6;
+                B[j+4][i+2] = tmp_7;
+                B[j+4][i+3] = tmp_8;
+            }
+            j -= 4;
+            j += 4;
+
+            for (i += 4, k = 0; k < 4; i++, k++) {
+                tmp_1 = A[i][j];
+                tmp_2 = A[i][j+1];
+                tmp_3 = A[i][j+2];
+                tmp_4 = A[i][j+3];
+
+                B[j][i] = tmp_1;
+                B[j+1][i] = tmp_2;
+                B[j+2][i] = tmp_3;
+                B[j+3][i] = tmp_4;
+            }
+            i -= 8;
+            j -= 4;
+        }
+    }
 }
+
+
+
+
 
 /* 
  * You can define additional transpose functions below. We've defined
